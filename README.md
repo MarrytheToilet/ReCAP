@@ -67,6 +67,24 @@ how much failure reranking can even address stays visible.
    **online verified-proposal controller** (a proposal is committed only if
    branch replay proves a shorter successful suffix).
 
+## Method in brief
+
+A certified preference is a tuple `(a⁺ ≻ a_exec | s_t, C_t)`: at logged state
+`s_t` with candidate set `C_t`, replay proved that some `a⁺ ∈ C_t` yields a
+verified successful suffix where the executed action `a_exec` did not. ReCAP
+trains a **support-constrained** policy `π_θ(a | C_t)` that scores *only* the
+candidates in `C_t` — it never invents actions, it reorders the ones the agent
+already produced. The training objective combines three terms:
+
+- a **weighted pairwise** term over certified preferences (`a⁺` above `a_exec`),
+- an **expected-reward** term from the replay outcomes, and
+- a **KL / rank-prior** regularizer toward the base ordering,
+
+so selection improves without drifting off the logged support. For the
+closed-loop agent the same objective is applied as a KL-regularized LoRA update on
+Gemma2-2B; at test time the policy scores the admissible pool and executes its top
+action with no external reranker or API.
+
 ## Results
 
 | Setting | Metric | Baseline | ReCAP |
@@ -101,6 +119,29 @@ how much failure reranking can even address stays visible.
 <div align="center">
 <img src="assets/recap_diagnosis_summary.png" alt="Failure decomposition" width="100%"/>
 </div>
+
+## Environments
+
+| Environment | Role | What the ledger reveals |
+|---|---|---|
+| TextWorld (hard / xhard) | primary | misranking is common **and** repairable |
+| ALFWorld | transfer | misranking even more common, different action vocabulary |
+| ScienceWorld | transfer | generation-limited: most failures are candidate-*absent* |
+
+Every adapter exposes a deterministic reset and normalized commands — that is what
+makes replay certification sound and reproducible.
+
+## Scope and limitations
+
+ReCAP repairs **candidate-present** failures. Candidate-absent steps need stronger
+generation or search; same-as-executed and no-local-repair steps point to earlier
+or longer-horizon causes. The ledger *counts* all of these, so the addressable
+share of failure is explicit rather than hidden. The certificate assumes a
+**replayable** environment (deterministic reset plus a verifier suffix — here,
+normalized TextWorld-family commands); extending to web, embodied, or
+manipulation agents requires environment-specific certificates such as repeated
+branch sampling, partial-progress checks, state-equivalence predicates, or learned
+suffix policies.
 
 ## Install
 
