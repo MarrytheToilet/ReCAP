@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from acta.envs.toy_adapter import ToyAdapter
-from acta.rewrite import NormalizerConfig, ReplayNormalizer
+from recap.envs.toy_adapter import ToyAdapter
+from recap.rewrite import NormalizerConfig, ReplayNormalizer
 
 
 def make_normalizer(**kwargs: object) -> ReplayNormalizer:

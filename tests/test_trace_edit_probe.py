@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from dataclasses import replace
 
-from acta.envs.base import StepResult
-from acta.envs.toy_adapter import ToyAdapter
-from acta.probe.trace_edit_probe import TraceEditConfig, TraceEditProbe
+from recap.envs.base import StepResult
+from recap.envs.toy_adapter import ToyAdapter
+from recap.probe.trace_edit_probe import TraceEditConfig, TraceEditProbe
 
 
 class KitchenGoalToyAdapter(ToyAdapter):

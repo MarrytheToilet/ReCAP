@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from acta.agents import AgentContext, CandidateAction
-from acta.agents.feedback_agent import TraceFeedbackAgent
-from acta.probe.trace_feedback import feedback_from_report, include_report
+from recap.agents import AgentContext, CandidateAction
+from recap.agents.feedback_agent import TraceFeedbackAgent
+from recap.probe.trace_feedback import feedback_from_report, include_report
 
 
 class RecordingAgent:

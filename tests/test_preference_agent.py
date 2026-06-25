@@ -2,14 +2,14 @@ from __future__ import annotations
 
 import json
 
-from acta.agents import AgentContext, CandidateAction
-from acta.agents.preference_agent import (
+from recap.agents import AgentContext, CandidateAction
+from recap.agents.preference_agent import (
     ActionPreference,
     PreferenceRerankAgent,
     load_action_preferences,
 )
-from acta.agents.learned_reranker_agent import LearnedRerankerAgent, load_reranker_model
-from acta.models.policy_reranker import train_policy_reranker
+from recap.agents.learned_reranker_agent import LearnedRerankerAgent, load_reranker_model
+from recap.models.policy_reranker import train_policy_reranker
 
 
 class FixedAgent:

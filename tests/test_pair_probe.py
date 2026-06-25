@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import json
 
-from acta.envs.toy_adapter import ToyAdapter
-from acta.probe import PairProbe, ProbeConfig
+from recap.envs.toy_adapter import ToyAdapter
+from recap.probe import PairProbe, ProbeConfig
 
 
 def make_probe(mode: str = "full") -> PairProbe:

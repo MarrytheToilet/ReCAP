@@ -1,13 +1,13 @@
 from __future__ import annotations
 
-from acta.agents import AgentContext, CandidateAction
-from acta.controllers import (
-    ActAController,
+from recap.agents import AgentContext, CandidateAction
+from recap.controllers import (
+    PriorController,
     ReplayRepairController,
     ReplayVerifiedProposalController,
 )
-from acta.envs.toy_adapter import ToyAdapter
-from acta.eval.agent_loop import run_episode
+from recap.envs.toy_adapter import ToyAdapter
+from recap.eval.agent_loop import run_episode
 
 
 class FixedCandidateAgent:
@@ -86,7 +86,7 @@ class DoorGoalToyAdapter(GoldToyAdapter):
         )
 
 
-def test_acta_controller_reranks_noop_below_effectful_action() -> None:
+def test_prior_controller_reranks_noop_below_effectful_action() -> None:
     adapter = ToyAdapter()
     reset = adapter.reset("toy-default", seed=0)
     context = AgentContext(
@@ -99,7 +99,7 @@ def test_acta_controller_reranks_noop_below_effectful_action() -> None:
         state_signature=adapter.signature(reset.state),
         seen_signatures=(adapter.signature(reset.state),),
     )
-    controller = ActAController(adapter, env_name="toy")
+    controller = PriorController(adapter, env_name="toy")
 
     decision = controller.rerank(
         context,
@@ -110,7 +110,7 @@ def test_acta_controller_reranks_noop_below_effectful_action() -> None:
     assert "noop" in decision.reasons["look"]
 
 
-def test_acta_controller_cache_preserves_decision() -> None:
+def test_prior_controller_cache_preserves_decision() -> None:
     adapter = ToyAdapter()
     reset = adapter.reset("toy-default", seed=0)
     context = AgentContext(
@@ -123,7 +123,7 @@ def test_acta_controller_cache_preserves_decision() -> None:
         state_signature=adapter.signature(reset.state),
         seen_signatures=(adapter.signature(reset.state),),
     )
-    controller = ActAController(adapter, env_name="toy")
+    controller = PriorController(adapter, env_name="toy")
     candidates = [CandidateAction("look"), CandidateAction("open door")]
 
     first = controller.rerank(context, candidates)
@@ -140,7 +140,7 @@ def test_acta_controller_cache_preserves_decision() -> None:
 def test_agent_loop_restores_state_after_controller_probe() -> None:
     adapter = ToyAdapter()
     agent = FixedCandidateAgent(["look", "open door"])
-    controller = ActAController(adapter, env_name="toy")
+    controller = PriorController(adapter, env_name="toy")
 
     result = run_episode(
         adapter=adapter,
@@ -175,7 +175,7 @@ def test_agent_loop_without_controller_uses_first_candidate() -> None:
 def test_agent_loop_logs_gold_recovery_diagnostics() -> None:
     adapter = GoldToyAdapter()
     agent = FixedCandidateAgent(["look", "open door"])
-    controller = ActAController(adapter, env_name="toy")
+    controller = PriorController(adapter, env_name="toy")
 
     result = run_episode(
         adapter=adapter,
@@ -194,15 +194,15 @@ def test_agent_loop_logs_gold_recovery_diagnostics() -> None:
     assert step.gold_rank_before == 2
     assert step.gold_rank_after == 1
     assert step.selected_is_gold
-    assert step.acta_recovered_gold
-    assert not step.acta_demoted_gold
+    assert step.recap_recovered_gold
+    assert not step.recap_demoted_gold
     assert step.top1_action == "look"
     assert "noop" in step.top1_structural_reasons
     assert "seen_state" in step.top1_structural_reasons
     assert step.top1_structural_bad
-    assert step.acta_blocked_bad_top1
+    assert step.recap_blocked_bad_top1
     assert result.metrics["selected_gold_rate"] == 1.0
-    assert result.metrics["acta_recovered_gold"] == 1.0
+    assert result.metrics["recap_recovered_gold"] == 1.0
 
 
 def test_recap_replay_controller_promotes_verified_success_candidate() -> None:

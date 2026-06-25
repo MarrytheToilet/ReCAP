@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from acta.eval.compare_agent_runs import paired_summary
+from recap.eval.compare_agent_runs import paired_summary
 
 
 def episode(task_id: str, success: bool, repeat: float = 0.0, interventions: int = 0):

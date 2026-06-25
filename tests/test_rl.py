@@ -2,13 +2,13 @@ from __future__ import annotations
 
 import random
 
-from acta.agents import AgentContext
-from acta.controllers import ActAController
-from acta.envs.toy_adapter import ToyAdapter
-from acta.rl.tabular_q import QLearningConfig, choose_action
+from recap.agents import AgentContext
+from recap.controllers import PriorController
+from recap.envs.toy_adapter import ToyAdapter
+from recap.rl.tabular_q import QLearningConfig, choose_action
 
 
-def test_acta_hard_prior_filters_noop_from_q_action_choice() -> None:
+def test_recap_hard_prior_filters_noop_from_q_action_choice() -> None:
     adapter = ToyAdapter()
     reset = adapter.reset("toy-default", seed=0)
     context = AgentContext(
@@ -22,14 +22,14 @@ def test_acta_hard_prior_filters_noop_from_q_action_choice() -> None:
         seen_signatures=(adapter.signature(reset.state),),
         initial_observation=reset.observation,
     )
-    controller = ActAController(adapter, env_name="toy")
+    controller = PriorController(adapter, env_name="toy")
 
     choice = choose_action(
         q_values={},
         state_signature=adapter.signature(reset.state),
         actions=("look", "open door"),
         context=context,
-        config=QLearningConfig(prior="acta-hard", epsilon=0.0),
+        config=QLearningConfig(prior="prior-hard", epsilon=0.0),
         rng=random.Random(0),
         controller=controller,
         epsilon=0.0,

@@ -1,2 +1,0 @@
-"""Evaluation scripts for ActA."""
-

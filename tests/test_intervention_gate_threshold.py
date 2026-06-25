@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from acta.models.select_intervention_gate_threshold import selection_key, threshold_grid
+from recap.models.select_intervention_gate_threshold import selection_key, threshold_grid
 
 
 def test_threshold_grid_includes_rounded_stop() -> None:

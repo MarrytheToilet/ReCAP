@@ -1,4 +1,4 @@
-from acta.eval.eval_recap_sensitivity import evaluate_sensitivity
+from recap.eval.eval_recap_sensitivity import evaluate_sensitivity
 
 
 def test_top_k_truncation_converts_lost_certified_repairs_to_absent() -> None:

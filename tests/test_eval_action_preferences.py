@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from acta.agents.preference_agent import ActionPreference
-from acta.eval.eval_action_preferences import evaluate_preferences, summarize_records
+from recap.agents.preference_agent import ActionPreference
+from recap.eval.eval_action_preferences import evaluate_preferences, summarize_records
 
 
 def test_evaluates_preference_against_recorded_candidates() -> None:

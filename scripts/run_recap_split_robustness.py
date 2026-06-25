@@ -12,13 +12,13 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from acta.eval.eval_candidate_ranking import evaluate_candidate_ranking, index_predictions, summarize_ranking
-from acta.eval.make_recap_splits import make_splits
-from acta.models.eval_action_reranker import predict_preferences as predict_feature_preferences
-from acta.models.eval_policy_reranker import predict_preferences as predict_policy_preferences
-from acta.models.reranker_dataset import read_jsonl, write_jsonl
-from acta.models.policy_reranker import train_policy_reranker
-from acta.models.train_action_reranker import train_feature_reranker
+from recap.eval.eval_candidate_ranking import evaluate_candidate_ranking, index_predictions, summarize_ranking
+from recap.eval.make_recap_splits import make_splits
+from recap.models.eval_action_reranker import predict_preferences as predict_feature_preferences
+from recap.models.eval_policy_reranker import predict_preferences as predict_policy_preferences
+from recap.models.reranker_dataset import read_jsonl, write_jsonl
+from recap.models.policy_reranker import train_policy_reranker
+from recap.models.train_action_reranker import train_feature_reranker
 
 
 def main() -> None:

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from acta.eval.bootstrap_recap_metrics import bootstrap_metrics
+from recap.eval.bootstrap_recap_metrics import bootstrap_metrics
 
 
 def test_bootstrap_metrics_reports_point_and_intervals() -> None:

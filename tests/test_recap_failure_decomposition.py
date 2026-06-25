@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from acta.eval.eval_recap_failure_decomposition import summarize_decomposition
+from recap.eval.eval_recap_failure_decomposition import summarize_decomposition
 
 
 def test_summarizes_failed_trajectory_decomposition() -> None:

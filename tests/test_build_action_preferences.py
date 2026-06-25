@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from acta.eval.build_action_preferences import build_preferences, build_recap_dataset
+from recap.eval.build_action_preferences import build_preferences, build_recap_dataset
 
 
 def test_builds_policy_repair_preference_from_trace_report() -> None:

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 
-from acta.eval.merge_trajectory_jsonl import merge_trajectories
+from recap.eval.merge_trajectory_jsonl import merge_trajectories
 
 
 def test_merge_trajectories_deduplicates_and_skips_errors(tmp_path) -> None:

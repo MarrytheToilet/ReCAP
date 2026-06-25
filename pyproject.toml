@@ -1,7 +1,7 @@
 [project]
-name = "acta"
+name = "recap"
 version = "0.1.0"
-description = "Learning contextual action algebra from environment probes for language agents."
+description = "ReCAP: replay-certified candidate-level preference learning for language agents."
 requires-python = ">=3.10"
 dependencies = []
 

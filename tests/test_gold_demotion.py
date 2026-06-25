@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from acta.eval.build_success_retention_dataset import build_retention_dataset
-from acta.eval.eval_candidate_ranking import evaluate_candidate_ranking, index_predictions
-from acta.eval.eval_gold_demotion import summarize_gold_demotion
+from recap.eval.build_success_retention_dataset import build_retention_dataset
+from recap.eval.eval_candidate_ranking import evaluate_candidate_ranking, index_predictions
+from recap.eval.eval_gold_demotion import summarize_gold_demotion
 
 
 def trajectory() -> dict[str, object]:

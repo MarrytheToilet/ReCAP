@@ -1,4 +1,4 @@
-from acta.envs.scienceworld_adapter import (
+from recap.envs.scienceworld_adapter import (
     parse_scienceworld_task_id,
     remaining_gold_suffix,
 )

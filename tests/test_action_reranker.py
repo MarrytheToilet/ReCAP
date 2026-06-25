@@ -1,25 +1,25 @@
 from __future__ import annotations
 
-from acta.eval.eval_candidate_ranking import evaluate_candidate_ranking, index_predictions, summarize_ranking
-from acta.eval.bootstrap_candidate_ranking import bootstrap_candidate_ranking
-from acta.eval.eval_candidate_ranking_by_action_type import evaluate_by_action_type
-from acta.models.eval_exact_memory_reranker import predict_preferences as predict_exact_preferences
-from acta.models.eval_heuristic_reranker import (
+from recap.eval.eval_candidate_ranking import evaluate_candidate_ranking, index_predictions, summarize_ranking
+from recap.eval.bootstrap_candidate_ranking import bootstrap_candidate_ranking
+from recap.eval.eval_candidate_ranking_by_action_type import evaluate_by_action_type
+from recap.models.eval_exact_memory_reranker import predict_preferences as predict_exact_preferences
+from recap.models.eval_heuristic_reranker import (
     build_heuristic_model,
     predict_preferences as predict_heuristic_preferences,
 )
-from acta.models.eval_nn_reranker import predict_preferences as predict_nn_preferences
-from acta.models.eval_random_reranker import predict_random
-from acta.models.eval_sklearn_reranker import predict_preferences as predict_sklearn_preferences
-from acta.models.exact_memory_reranker import build_exact_memory_model
-from acta.models.eval_action_reranker import predict_preferences
-from acta.models.cross_encoder_reranker import context_text, pointwise_training_rows, rank_candidates as rank_cross_encoder_candidates
-from acta.models.embedding_reranker import candidate_text_rows, joint_text
-from acta.models.nn_memory_reranker import build_memory_model
-from acta.models.policy_reranker import train_policy_reranker, rank_candidates as rank_policy_candidates
-from acta.models.reranker_dataset import featurize_candidate, pairwise_delta
-from acta.models.sklearn_reranker import fit_sklearn_reranker
-from acta.models.train_action_reranker import train_feature_reranker
+from recap.models.eval_nn_reranker import predict_preferences as predict_nn_preferences
+from recap.models.eval_random_reranker import predict_random
+from recap.models.eval_sklearn_reranker import predict_preferences as predict_sklearn_preferences
+from recap.models.exact_memory_reranker import build_exact_memory_model
+from recap.models.eval_action_reranker import predict_preferences
+from recap.models.cross_encoder_reranker import context_text, pointwise_training_rows, rank_candidates as rank_cross_encoder_candidates
+from recap.models.embedding_reranker import candidate_text_rows, joint_text
+from recap.models.nn_memory_reranker import build_memory_model
+from recap.models.policy_reranker import train_policy_reranker, rank_candidates as rank_policy_candidates
+from recap.models.reranker_dataset import featurize_candidate, pairwise_delta
+from recap.models.sklearn_reranker import fit_sklearn_reranker
+from recap.models.train_action_reranker import train_feature_reranker
 
 
 def preference() -> dict[str, object]:

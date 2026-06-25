@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from acta.eval.eval_repair_multiplicity import summarize_rows
+from recap.eval.eval_repair_multiplicity import summarize_rows
 
 
 def test_repair_multiplicity_summary_separates_logged_and_alternative_ties() -> None:

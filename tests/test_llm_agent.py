@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from acta.agents import AgentContext
-from acta.agents.llm_agent import (
+from recap.agents import AgentContext
+from recap.agents.llm_agent import (
     LLMConfig,
     MockLLMAgent,
     load_response_cache,
@@ -9,12 +9,12 @@ from acta.agents.llm_agent import (
     response_cache_key,
     save_response_cache,
 )
-from acta.agents.lm_policy_agent import (
+from recap.agents.lm_policy_agent import (
     is_semantic_undo,
     rank_lm_policy_pool,
     structural_penalty,
 )
-from acta.agents.noisy_agent import NoisyCandidateAgent
+from recap.agents.noisy_agent import NoisyCandidateAgent
 
 
 def test_parse_action_response_filters_to_admissible_actions() -> None:

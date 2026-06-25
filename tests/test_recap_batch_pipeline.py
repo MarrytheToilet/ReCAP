@@ -2,22 +2,22 @@ from __future__ import annotations
 
 import json
 
-from acta.eval.build_action_preferences import build_recap_dataset
-from acta.eval.collect_failure_trajectories import default_game_dir, infer_seed, select_games
-from acta.eval.compile_recap_batch import build_report_payload, load_episodes, load_reports
-from acta.eval.eval_candidate_ranking import (
+from recap.eval.build_action_preferences import build_recap_dataset
+from recap.eval.collect_failure_trajectories import default_game_dir, infer_seed, select_games
+from recap.eval.compile_recap_batch import build_report_payload, load_episodes, load_reports
+from recap.eval.eval_candidate_ranking import (
     evaluate_candidate_ranking,
     index_predictions,
     summarize_ranking,
 )
-from acta.eval.make_recap_splits import group_key, make_splits, split_summary
+from recap.eval.make_recap_splits import group_key, make_splits, split_summary
 
 
 def test_compile_batch_loads_jsonl_episodes_and_reports(tmp_path) -> None:
     trajectories = tmp_path / "trajectories.jsonl"
     reports = tmp_path / "reports.jsonl"
     episode = {
-        "task_id": "data/textworld_xhard_games/acta_xhard_seed203.z8",
+        "task_id": "data/textworld_xhard_games/recap_xhard_seed203.z8",
         "seed": 0,
         "success": False,
         "steps": [
@@ -29,7 +29,7 @@ def test_compile_batch_loads_jsonl_episodes_and_reports(tmp_path) -> None:
         ],
     }
     report = {
-        "task_id": "data/textworld_xhard_games/acta_xhard_seed203.z8",
+        "task_id": "data/textworld_xhard_games/recap_xhard_seed203.z8",
         "seed": 0,
         "original_actions": ["look"],
         "original_success": False,
@@ -126,7 +126,7 @@ def test_candidate_ranking_uses_learned_predictions_when_provided() -> None:
 def test_make_recap_splits_prevents_seed_leakage() -> None:
     records = tuple(
         {
-            "task_id": f"data/textworld_xhard_games/acta_xhard_seed{seed}.z8",
+            "task_id": f"data/textworld_xhard_games/recap_xhard_seed{seed}.z8",
             "seed": 0,
             "step_index": 0,
             "preferred_action": "go west",
@@ -196,8 +196,8 @@ def test_make_recap_splits_supports_task_id_groups() -> None:
 def test_collect_failure_helpers_select_games_and_infer_seed(tmp_path) -> None:
     game_dir = tmp_path / "games"
     game_dir.mkdir()
-    first = game_dir / "acta_xhard_seed203.z8"
-    second = game_dir / "acta_xhard_seed204.z8"
+    first = game_dir / "recap_xhard_seed203.z8"
+    second = game_dir / "recap_xhard_seed204.z8"
     first.write_text("", encoding="utf-8")
     second.write_text("", encoding="utf-8")
 

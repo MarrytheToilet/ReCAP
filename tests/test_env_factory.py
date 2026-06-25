@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from acta.envs.factory import default_task_dir, default_task_glob
+from recap.envs.factory import default_task_dir, default_task_glob
 
 
 def test_textworld_defaults_match_existing_layout() -> None:
