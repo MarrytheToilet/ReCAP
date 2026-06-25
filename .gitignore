@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+.ipynb_checkpoints/
+
+# Secrets / env
+.env
+.env.*
+
+# Paper (not published to this repo)
+paper/
+
+# Large generated artifacts / data / models
+data/
+analysis/
+models/
+checkpoints/
+logs/
+
+# Misc local logs
+*.log
+wget-log*
+texput.log

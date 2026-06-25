@@ -1,0 +1,15 @@
+[project]
+name = "acta"
+version = "0.1.0"
+description = "Learning contextual action algebra from environment probes for language agents."
+requires-python = ">=3.10"
+dependencies = []
+
+[project.optional-dependencies]
+test = ["pytest>=8"]
+textworld = ["textworld"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
