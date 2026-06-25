@@ -10,50 +10,72 @@
 
 ---
 
-## What is ReCAP?
+## TL;DR
 
-When an LLM agent fails a task, the repairing action is often *already in its own
-candidate list* — just ranked below the action it executed. ReCAP isolates this
-**candidate-ranking failure** and turns it into supervision: it replays each failed
-step, certifies which logged candidate actually repairs it, and learns a policy
-that reranks **only within the actions the agent already generated**.
+When an LLM agent fails a task, the action that would have fixed it is often
+**already in the agent's own candidate list — just ranked below the action it
+executed**. ReCAP isolates this *candidate-ranking failure*, replays each failed
+step to **certify** which logged candidate actually repairs it, and learns a
+policy that reranks **only within the actions the agent already generated**.
+Every preference is backed by a deterministic replay, and every failed step is
+accounted for in a ledger — so the result is auditable, not cherry-picked.
 
-This makes the learning signal *auditable* — every preference is backed by a
-deterministic replay, and every failed step is accounted for in a ledger
-(repairable, candidate-absent, same-as-executed, or no-local-repair), so the
-denominator of "how much of failure is even addressable by reranking" stays
-visible instead of being cherry-picked.
+## The story
 
-## The pipeline
+Language agents act as sequential controllers: read a state, propose a ranked
+list of candidate actions, execute the top one, inherit the next state. When such
+an agent fails a long-horizon task, the convenient diagnosis is "it didn't know
+the right action." That is often too coarse. Failure logs reveal a sharper
+pattern: **the repairing action was already in the candidate list, just ranked
+too low.**
+
+This distinction is *operational*, because it splits failures into two repair
+paths that need different fixes:
+
+- **Candidate-absent** — the right action is not in the set at all. The
+  bottleneck is generation/exploration; no reranker can help.
+- **Candidate-misranked** — the right action is present but not selected. The
+  agent already exposed the knowledge and failed at the *last* selection step.
+  This is what ReCAP repairs.
+
+ReCAP makes the second case learnable without judges, reward models, or
+expert demonstrations. It rewinds each failed step in a resettable environment
+and checks, by **replay**, whether any logged candidate leads to a verified
+successful continuation. If one does, it becomes a certified preference
+`a⁺ ≻ a_exec`. If none does, the step is filed in a **ledger**
+(same-as-executed / no-local-repair / candidate-absent) so the *denominator* of
+how much failure reranking can even address stays visible.
+
+## How it works
 
 <div align="center">
 <img src="assets/recap_pipeline.png" alt="ReCAP pipeline" width="100%"/>
 </div>
 
 1. **Agent rollout logging** — collect failed trajectories with their top-*k*
-   candidate set and the executed action. Only actions the agent already proposed
-   are recorded.
+   candidate set and executed action. Only actions the agent already proposed are
+   recorded (the support).
 2. **Replay certification** — rewind each failed step and test the logged
-   candidates against a verified continuation. Local, reproducible, no
-   cherry-picking.
-3. **Preference compiler & ledger** — emit a certified preference
-   *a⁺ ≻ a_exec* when a logged candidate repairs the step; record every
-   non-emitting case in the ledger.
+   candidates against a verified continuation. Local, deterministic, reproducible
+   from logs, no cherry-picking.
+3. **Preference compiler & ledger** — emit `a⁺ ≻ a_exec` when a logged candidate
+   repairs the step; record every non-emitting case in the ledger.
 4. **Support-constrained candidate policy** — rank only within the logged
    candidate set, trained from the certified preferences (weighted pairwise +
-   expected-reward + KL/rank-prior terms).
-5. **Deployment** — use the policy both as an offline reranker and as an online
-   verified-proposal controller.
+   expected-reward + KL/rank-prior terms; LoRA fine-tuning for the local agent).
+5. **Deployment** — the same policy serves as an **offline reranker** and as an
+   **online verified-proposal controller** (a proposal is committed only if
+   branch replay proves a shorter successful suffix).
 
-## Key results
+## Results
 
 | Setting | Metric | Baseline | ReCAP |
 |---|---|---|---|
-| Held-out reranking (TextWorld xhard) | MRR | 0.44 | **0.93** |
-| Held-out reranking | Top-1 correction | — | **0.86** |
-| Local LM agent, TextWorld **hard** | Success | 0.11 | **0.55** |
-| Local LM agent, TextWorld **xhard** | Success | 0.07 | **0.48** |
-| Online verified-proposal controller | Success | 0.84 | **0.96** |
+| Held-out reranking, TextWorld xhard | MRR | 0.44 | **0.93** |
+| Held-out reranking | Top-1 correction | 0.00 | **0.86** |
+| Local Gemma2-2B agent, TextWorld **hard** | Success | 0.11 | **0.55** |
+| Local Gemma2-2B agent, TextWorld **xhard** | Success | 0.07 | **0.48** |
+| Online verified-proposal controller (API agent) | Success | 0.84 | **0.96** |
 | Cross-env: ALFWorld | Held-out MRR | 0.26 | **0.51** |
 | Cross-env: ScienceWorld | Held-out MRR | 0.17 | **0.59** |
 
@@ -61,11 +83,26 @@ visible instead of being cherry-picked.
 <img src="assets/recap_learning_deployment.png" alt="From certified labels to control" width="100%"/>
 </div>
 
-The decomposition is not a TextWorld artifact: candidate misranking is even more
-common on ALFWorld, while ScienceWorld is generation-limited (most failures are
-candidate-*absent*), which the ledger flags directly.
+- **Offline.** A support-constrained policy moves held-out candidate-ranking MRR
+  from 0.44 to 0.93 (0.86 top-1 correction) on 105 disjoint test preferences,
+  beating BGE-ReCAP-SFT, nearest-neighbour memory, and embedding baselines.
+- **Closed-loop.** Trained into a local Gemma2-2B agent that directly selects and
+  executes, success rises 0.11→0.55 (hard) and 0.07→0.48 (xhard); the agent picks
+  the gold action far more often and cuts structurally bad loop/no-op actions
+  threefold (48 rescued / 4 harmed on hard, paired 95% CI `[+33,+55]` pts).
+- **Online.** As a replay-verified controller on a stronger API agent, success
+  goes 0.84→0.96 (12 rescued, 0 harmed) while shortening episodes — verifier-free
+  gates do not move the needle, but replay verification does.
+- **Generality.** The same pipeline transfers to ALFWorld (misranking is even
+  *more* common there) and flags ScienceWorld as generation-limited (most
+  failures are candidate-*absent*). Ablations and sensitivity checks attribute the
+  gains to the certified preferences, not the loss form or candidate budget.
 
-## Installation
+<div align="center">
+<img src="assets/recap_diagnosis_summary.png" alt="Failure decomposition" width="100%"/>
+</div>
+
+## Install
 
 ```bash
 git clone https://github.com/MarrytheToilet/ReCAP.git
@@ -75,15 +112,15 @@ pip install -e ".[test]"
 # optional environments: pip install -e ".[textworld]"   # plus alfworld / scienceworld
 ```
 
-## Quickstart
+## Reproduce, step by step
 
-Verify the deterministic replay core:
+**0. Verify the deterministic replay core (no GPU, no API):**
 
 ```bash
 pytest -q
 ```
 
-Run the local LM-agent loop with no external API (mock LLM):
+**1. Run the local agent loop with a mock LLM (no external API):**
 
 ```bash
 python -m recap.eval.eval_agent data/textworld_games/recap_seed11.z8 \
@@ -91,36 +128,46 @@ python -m recap.eval.eval_agent data/textworld_games/recap_seed11.z8 \
   --max-candidates 5 --max-steps 12
 ```
 
-Compile certified preferences from a failed run, split, then train and evaluate a
-candidate-ranking reranker:
+**2. Reproduce the headline offline-reranking number** — from logged
+trajectories to a held-out MRR, the core ReCAP loop:
 
 ```bash
-# 1. compile replay-certified preferences + ledger from logged trajectories
+# (a) compile replay-certified preferences + ledger
 python -m recap.eval.compile_recap_batch \
   --trajectories analysis/recap_xhard_pilot_trajectories.jsonl \
   --source policy-repair \
-  --out-preferences analysis/recap_pilot_preferences.jsonl \
-  --out-ledger analysis/recap_pilot_ledger.jsonl \
-  --out-summary analysis/recap_pilot_compile_summary.json
+  --out-preferences analysis/prefs.jsonl \
+  --out-ledger analysis/ledger.jsonl \
+  --out-summary analysis/compile_summary.json
 
-# 2. leakage-checked train/valid/test splits (disjoint by seed or task)
+# (b) leakage-checked, disjoint train/valid/test splits
 python -m recap.eval.make_recap_splits \
-  --preferences analysis/recap_pilot_preferences.jsonl \
-  --split-by task_id --out-dir analysis/recap_pilot_splits
+  --preferences analysis/prefs.jsonl --split-by task_id \
+  --out-dir analysis/splits
 
-# 3. train + evaluate the support-constrained candidate policy
+# (c) train the support-constrained candidate policy
 python -m recap.models.train_policy_reranker \
-  --train analysis/recap_pilot_splits/train.jsonl \
-  --out models/recap_policy_reranker.pt
+  --train analysis/splits/train.jsonl --out models/recap_policy.pt
+
+# (d) evaluate held-out ranking (reports MRR + top-1 correction)
 python -m recap.models.eval_policy_reranker \
-  --test analysis/recap_pilot_splits/test.jsonl \
-  --model models/recap_policy_reranker.pt \
-  --out analysis/recap_pilot_policy_eval.json
+  --test analysis/splits/test.jsonl --model models/recap_policy.pt \
+  --out analysis/policy_eval.json
 ```
 
-To run against an OpenAI-compatible API, copy `.env.example` to `.env` and set
-`OPENAI_API_KEY`, `OPENAI_BASE_URL`, and `RECAP_LLM_MODEL`, then pass
-`--agent openai`.
+**3. Use a real API agent.** Copy the template and fill in credentials, then pass
+`--agent openai`:
+
+```bash
+cp .env.example .env     # set OPENAI_API_KEY, OPENAI_BASE_URL, RECAP_LLM_MODEL
+python -m recap.eval.eval_agent data/textworld_games/recap_seed11.z8 \
+  --agent openai --controller prior --fast-controller \
+  --max-candidates 5 --max-steps 12
+```
+
+The cross-encoder reranker (`train_cross_encoder_reranker` / `eval_cross_encoder_reranker`)
+and the closed-loop LoRA policy (`train_lm_candidate_policy`) follow the same
+splits; see `paper/` for the full protocol and exact configurations.
 
 ## Repository layout
 
@@ -135,16 +182,16 @@ recap/
   probe/ rewrite/ rl/   action-pair probes, normal-form rewriting, tabular-Q baselines
 tests/           replay, decomposition, reranking, and agent-loop tests
 assets/          figures
+paper/           manuscript, full experimental protocol, and exact configs
 ```
 
 ## Citation
 
-If you use ReCAP, please cite the accompanying paper (see `paper/`).
-
 ```bibtex
-@misc{recap,
+@misc{recap2026,
   title  = {When Agents Know the Right Action but Rank It Wrong:
             Replay-Certified Candidate-Level Preference Learning},
   year   = {2026},
+  note   = {https://github.com/MarrytheToilet/ReCAP},
 }
 ```
