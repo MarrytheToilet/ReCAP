@@ -2,9 +2,9 @@
 
 <img src="assets/pr.png" alt="ReCAP" width="620"/>
 
-# ReCAP: Replay-Certified Candidate-Level Preference Learning
+# ReCAP — Hidden in Plain Sight: Replay-Certified Preference Learning over an Agent's Own Candidates
 
-**When an agent knows the right action but ranks it wrong.**
+**When the repairing action is already in the agent's candidate list — just ranked too low.**
 
 </div>
 
@@ -210,6 +210,12 @@ The cross-encoder reranker (`train_cross_encoder_reranker` / `eval_cross_encoder
 and the closed-loop LoRA policy (`train_lm_candidate_policy`) follow the same
 splits; see `paper/` for the full protocol and exact configurations.
 
+**4. Strict certificate & attribution analyses.** The strict paired-cost
+audit (`recap.eval.eval_strict_certificate`), its robustness checks, the
+online verification-cost accounting, and the closed-loop attribution controls
+(shuffled / loop-only rewards) are documented step by step, with expected
+outputs, in [`scripts/REPRODUCE_review_response.md`](scripts/REPRODUCE_review_response.md).
+
 ## Repository layout
 
 ```
@@ -230,8 +236,8 @@ paper/           manuscript, full experimental protocol, and exact configs
 
 ```bibtex
 @misc{recap2026,
-  title  = {When Agents Know the Right Action but Rank It Wrong:
-            Replay-Certified Candidate-Level Preference Learning},
+  title  = {Hidden in Plain Sight: Replay-Certified Preference Learning
+            over an Agent's Own Candidates},
   year   = {2026},
   note   = {https://github.com/MarrytheToilet/ReCAP},
 }
