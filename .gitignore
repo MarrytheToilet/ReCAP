@@ -1,26 +1,55 @@
-# Python
+# Python environments, caches and build products
 __pycache__/
 *.py[cod]
 .pytest_cache/
-.venv/
+.mypy_cache/
+.ruff_cache/
+.venv*/
+venv/
 .ipynb_checkpoints/
+*.egg-info/
+/build/
+/dist/
+.coverage
+htmlcov/
 
-# Secrets / env
+# Local credentials (only the empty example belongs in Git)
 .env
 .env.*
 !.env.example
+*.pem
+*.key
 
-# Paper (not published to this repo)
-paper/
+# Generated experiment data, results, models and local archives
+/data/
+/analysis/
+/results/
+/models/
+/checkpoints/
+/logs/
+/backups/
+*.pt
+*.pth
+*.safetensors
+*.pkl
+*.joblib
 
-# Large generated artifacts / data / models
-data/
-analysis/
-models/
-checkpoints/
-logs/
+# Manuscript and external benchmark installations are maintained locally
+/paper/
+/third_party/
 
-# Misc local logs
+# Machine-specific agent/editor state
+/.agents/
+/.claude/
+/.codex/
+/.vscode/
+.idea/
+.DS_Store
+
+# Transient experiment output
 *.log
+*.tmp
+*.lock
+*.pid
 wget-log*
 texput.log
