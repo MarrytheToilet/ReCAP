@@ -6,10 +6,19 @@ requires-python = ">=3.10"
 dependencies = []
 
 [project.optional-dependencies]
-test = ["pytest>=8"]
+test = ["pytest>=8", "numpy", "torch", "scikit-learn"]
+models = ["numpy", "torch", "scikit-learn", "transformers", "peft", "sentence-transformers"]
+plot = ["matplotlib", "numpy"]
 textworld = ["textworld"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
 
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["recap*", "scripts*"]
